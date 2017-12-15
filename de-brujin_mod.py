@@ -62,6 +62,8 @@ def merge_dicts(d1,d2):
 def contig_to_string(c):
     return c[0] + ''.join(x[-1] for x in c[1:])
 
+
+# we will work here today 
 def get_contig(d,km):
     c_fw = get_contig_forward(d,km)
     
@@ -73,7 +75,7 @@ def get_contig(d,km):
         c = [twin(x) for x in c_bw[-1:0:-1]] + c_fw
     return contig_to_string(c),c
         
-
+# And here
 def get_contig_forward(d,km):
     c_fw = [km]
     
@@ -128,20 +130,56 @@ def all_contigs(d,k):
 
     return G,r
 
-    
-def print_GFA(G,cs,k,d):
-    print("H  VN:Z:1.0")
-    for i,x in enumerate(cs):
-        print("S\t%d\t%s\t*"%(i,x))
-        
-    for i in G:
-        for j,o in G[i][0]:
-            print("L\t%d\t+\t%d\t%s\t%dM"%(i,j,o,k-1))
-        for j,o in G[i][1]:
-            print("L\t%d\t-\t%d\t%s\t%dM"%(i,j,o,k-1))
+# Check contigs for kmers and get count
+def kmer_count2(cs,d, k, id, file):
+    for x in range(0,len(cs)+1-k):
+        key = cs[x:x+k]
+        # "F 1 * 0 538 1 32 ATGCGCTCGCTCGCTGAGCTGAC A:i:234" 
+        file.write("F\t%s\t%d\t%d\t%d\t%d\t%s\tA:i:%s\n"%(id,0,len(cs),x,x+k,key,d[key][0]))
+        file.write("F\t%s\t%d\t%d\t%d\t%d\t%s\tB:i:%s\n"%(id,0,len(cs),x,x+k,key,d[key][1]))
 
-    for i in d.keys(): 
-        print("#\t%s\tRC A:%d B:%d"%(i,d[i][0],d[i][1])) 
+# Check contigs for kmers and get count
+def kmer_count(cs,d, k, id, file):
+    for x in range(0,len(cs)+1-k):
+        key = cs[x:x+k]
+        # "F 1 * 0 538 1 32 ATGCGCTCGCTCGCTGAGCTGAC A:i:234" 
+        file.write("F\t%s\tA:%d\t%d\t%d\t%d\t%s\t*\n"%(id,d[key][0],len(cs),x,x+k,key))
+        file.write("F\t%s\tB:%d\t%d\t%d\t%d\t%s\t*\n"%(id,d[key][1],len(cs),x,x+k,key))
+
+# Write to line
+def write_GFA2(G,cs,k,d):
+    filename = "test.gfa"
+    with open(filename, "w+") as file:
+        
+        file.write("H  VN:Z:2.0\n")
+        for i,x in enumerate(cs):
+            file.write("S\t%d\t%d\t%s\t\n"%(i,len(x), x ))
+            kmer_count(x,d,k,i,file)
+
+        for i in G:
+            for j,o in G[i][0]:
+                file.write("L\t%d\t+\t%d\t%s\t%dM\n"%(i,j,o,k-1))
+            for j,o in G[i][1]:
+                file.write("L\t%d\t-\t%d\t%s\t%dM\n"%(i,j,o,k-1))
+
+        for i in d.keys(): 
+            file.write("#\t%s\tRC A:%d B:%d\n"%(i,d[i][0],d[i][1])) 
+
+def write_GFA(G,cs,k,d):
+    filename = "test.gfa"
+    with open(filename, "w+") as file:
+        file.write("H  VN:Z:1.0")
+        for i,x in enumerate(cs):
+            print("S\t%d\t%s\t*\n"%(i,x))
+            
+        for i in G:
+            for j,o in G[i][0]:
+                print("L\t%d\t+\t%d\t%s\t%dM\n"%(i,j,o,k-1))
+            for j,o in G[i][1]:
+                print("L\t%d\t-\t%d\t%s\t%dM\n"%(i,j,o,k-1))
+
+        for i in d.keys(): 
+            print("#\t%s\tRC A:%d B:%d"%(i,d[i][0],d[i][1])) 
 
 
 if __name__ == "__main__":
@@ -154,4 +192,4 @@ if __name__ == "__main__":
     with open('dict_of_ratio_1.txt', "w+") as f:
         f.write(str(d))
     G,cs = all_contigs(d,k)
-    print_GFA(G,cs,k,d)
+    write_GFA2(G,cs,k,d)
