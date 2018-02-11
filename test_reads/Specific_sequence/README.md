@@ -25,3 +25,4 @@ In this folder you will find:
 			* (70-k)+1 k-mers found
 			* Only the first k-mer was shared
 			* Completely Connected graph 
+![graph.png!](./graph.png)
