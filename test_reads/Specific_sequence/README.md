@@ -22,6 +22,6 @@ In this folder you will find:
 	+ Results of running optimized_dbg.py on seq_test.txt against seq2_test.txt
 	+ $ python3 -k 10 -A seq_test.fq -B seq2_test.fq -output seq_test2.gfa
 		* The result was as expected: 
-		* (70-k)+1 k-mers found
-		* Only the first k-mer was shared
-		* Completely Connected graph 
+			* (70-k)+1 k-mers found
+			* Only the first k-mer was shared
+			* Completely Connected graph 
